@@ -334,7 +334,19 @@
     <div id="app"></div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyiXZrESy29cCB6jTAua9vtcYssNdiQAUdkYz8GvpjX79cgGHtuAORkNqUncIu3mwV-mg/exec";
+       function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  
+  // Capture whatever raw text arrives and put it straight into the sheet
+  var rawData = (e && e.postData) ? e.postData.contents : "No postData found";
+  sheet.appendRow([rawData, new Date()]);
+  
+  return ContentService
+    .createTextOutput(JSON.stringify({ "result": "success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyiXZrESy29cCB6jTAua9vtcYssNdiQAUdkYz8GvpjX79cgGHtuAORkNqUncIu3mwV-mg/exec";
 
 function syncToCloud(dateStr, standId, standData) {
     const payload = {
