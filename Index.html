@@ -334,6 +334,29 @@
     <div id="app"></div>
 
     <script>
+        const WEB_APP_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+function syncToCloud(dateStr, standId, standData) {
+    const payload = {
+        date: dateStr,
+        standId: standId,
+        filter: standData.filter,
+        dump: standData.dump,
+        oil: standData.oil,
+        done: standData.done
+    };
+
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    }).catch(error => console.error("Sync error:", error));
+    ;}
+
+
         const stadiumData = [
             { level: "View Level", stands: [
                 { id: "#411", size: 50, total: 4 },
@@ -523,6 +546,13 @@
             saveLogs();
             updateTotals();
         }
+
+        function saveLogs() {
+            localStorage.setItem('angels_fryer_logs_v8', JSON.stringify(allLogs));
+    
+    // Trigger cloud sync for the active date and data
+    syncToCloud(currentDate, currentStandId, allLogs[currentDate][currentStandId]);
+}
 
         function saveLogs() {
             localStorage.setItem('angels_fryer_logs_v8', JSON.stringify(allLogs));
