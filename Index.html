@@ -317,6 +317,12 @@
         .admin-btn-danger {
             background: #ff3b30;
         }
+        .footer-tag {
+            text-align: center;
+            color: #8e8e93;
+            font-size: 11px;
+            margin-top: 24px;
+        }
     </style>
 </head>
 <body>
@@ -339,7 +345,6 @@
         <select id="new-stand-size">
             <option value="50">50 lb</option>
             <option value="80">80 lb</option>
-            <option value="8">8 lb</option>
         </select>
         <input type="number" id="new-stand-total" placeholder="Max Fryer Count">
         <button class="action-btn" style="background:#34c759;" onclick="addStand()">Add Stand</button>
@@ -392,17 +397,19 @@
 
 <div id="app"></div>
 
+<div class="footer-tag">"FiltaOC[TESTV.1•o]"</div>
+
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwOZFVD1iITEH34zV5g8PGmb4osXYWAM7fPUh-tmeDyMaBe3_YLJkJ4Tdzeb1CpzB2k/exec"; 
     
     const defaultData = [
-        { level: "View Level", stands: [{ id: "#411", size: 50, total: 4 }, { id: "#425", size: 50, total: 4 }] },
-        { level: "Club Level", stands: [{ id: "#344", size: 50, total: 2 }, { id: "#334", size: 50, total: 3 }, { id: "1st Base", size: 80, total: 4 }] },
-        { level: "Terrace Level", stands: [{ id: "#226", size: 80, total: 3 }, { id: "#223", size: 50, total: 6 },{ id: "#207", size: 50, total: 4 }, { id: "#207", size: 80, total: 2 }, { id: "#255", size: 50, total: 4 }, { id: "#255", size: 80, total: 3 },
-        { level: "Field Level", stands: [{ id: "#130", size: 50, total: 6 }, { id: "DC Restaurant", size: 80, total: 3 }, { id: "#DC Inseat", size: 80, total: 3 }, { id: "#109", size: 50, total: 1 }, { id: "#106", size: 80, total: 4 }, { id: "Main Kitchen", size: 80, total: 3 }, { id: "Commissary", size: 80, total: 1 }] },
-        
-    const defaultTechs = ["Angel", "Manuel", "Carlos", "Moses", "Frankie"]};
+      { level: "View Level", stands: [{ id: "#411", size: 50, total: 4 }, { id: "#425", size: 50, total: 4 }] },
+      { level: "Club Level", stands: [{ id: "#344", size: 50, total: 2 }, { id: "#334", size: 50, total: 3 }, { id: "1st Base", size: 80, total: 4 }] },        
+      { level: "Terrace Level", stands: [{ id: "#226", size: 80, total: 3 }, { id: "#223", size: 50, total: 6 }, { id: "#207", size: 50, total: 4 }, { id: "#207", size: 80, total: 2 }, { id: "#255", size: 50, total: 4 }, { id: "#255", size: 80, total: 3 }] },
+      { level: "Field Level", stands: [{ id: "#130", size: 50, total: 6 }, { id: "DC Restaurant", size: 80, total: 3 }, { id: "#DC Inseat", size: 80, total: 3 }, { id: "#109", size: 50, total: 1 }, { id: "#106", size: 80, total: 4 }, { id: "Main Kitchen", size: 80, total: 3 }, { id: "Commissary", size: 80, total: 1 }] }
+    ];
 
+    const defaultTechs = ["Angel", "Manuel", "Carlos", "Moses", "Frankie"];
     let stadiumData = JSON.parse(localStorage.getItem('angels_stadium_config_v10')) || defaultData;
     let technicianList = JSON.parse(localStorage.getItem('angels_technicians_v10')) || defaultTechs;
     let selectedTech = localStorage.getItem('angels_selected_tech_v10') || technicianList[0];
@@ -677,6 +684,28 @@
         document.getElementById('total-oil-val').innerText = totalOil.toFixed(1);
     }
 
+    function getLevelSummary(levelName) {
+        const sec = stadiumData.find(s => s.level.toLowerCase().trim() === levelName.toLowerCase().trim());
+        if (!sec || !sec.stands.length) return "N/A";
+        
+        const dayState = getCurrentDateState();
+
+        const standEntries = sec.stands.map(st => {
+            const s = dayState[st.id];
+            if (!s) return `${st.id}: Not Serviced`;
+            if (s.isNS) return `${st.id}: [NS]`;
+            
+            const f = s.filter !== "" ? s.filter : "0";
+            const d = s.dump !== "" ? s.dump : "0";
+            const oil = s.oil !== "" ? `${s.oil}gal` : "0gal";
+            const doneMark = s.done ? "✓ " : "";
+            
+            return `${doneMark}${st.id} (F:${f}, D:${d}, Oil:${oil})`;
+        });
+
+        return standEntries.join(" | ");
+    }
+
     function submitToCloud() {
         let dayState = getCurrentDateState();
         let f50Total = 0, d50Total = 0, f80Total = 0, d80Total = 0, oilTotal = 0;
@@ -685,8 +714,14 @@
             sec.stands.forEach(st => {
                 let stObj = dayState[st.id];
                 if (stObj && !stObj.isNS) {
-                    if (st.size === 50) { f50Total += (parseInt(stObj.filter) || 0); d50Total += (parseInt(stObj.dump) || 0); }
-                    if (st.size === 80) { f80Total += (parseInt(stObj.filter) || 0); d80Total += (parseInt(stObj.dump) || 0); }
+                    if (st.size === 50) { 
+                        f50Total += (parseInt(stObj.filter) || 0); 
+                        d50Total += (parseInt(stObj.dump) || 0); 
+                    }
+                    if (st.size === 80) { 
+                        f80Total += (parseInt(stObj.filter) || 0); 
+                        d80Total += (parseInt(stObj.dump) || 0); 
+                    }
                 }
                 if (stObj && stObj.oil) oilTotal += (parseFloat(stObj.oil) || 0);
             });
@@ -694,10 +729,10 @@
 
         let payload = {
             technician: selectedTech,
-            fieldLevel: "Logged",
-            terraceLevel: "Logged",
-            clubLevel: "Logged",
-            viewLevel: "Logged",
+            fieldLevel: getLevelSummary("Field Level"),
+            terraceLevel: getLevelSummary("Terrace Level"),
+            clubLevel: getLevelSummary("Club Level"),
+            viewLevel: getLevelSummary("View Level"),
             comments: `Shift Date: ${currentDate}`,
             f50Count: f50Total,
             d50Count: d50Total,
@@ -723,12 +758,6 @@
     initTechnicianDropdown();
     render();
 </script>
+<h6><img src="img/FiltaLogo.jpg"></h6>
 </body>
 </html>
-<html>
- <body>
-  <h6>"FiltaOC[TESTV.1•o]"
-    </h6>
-   </body>
-  </html>
-  
