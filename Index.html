@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angels Stadium Fryer Tracker</title>
+    <title>Angel's Stadium Service Tracker</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -11,19 +11,718 @@
             color: #1c1c1e;
             margin: 0;
             padding: 16px;
-            padding-bottom: 50px;
+            -webkit-tap-highlight-color: transparent;
         }
         h1 {
             font-size: 22px;
+            font-weight: 800;
+            margin: 0 0 4px 0;
             text-align: center;
-            color: #ba0021;
-            margin-bottom: 2px;
+            color: #1c1c1e;
         }
         .subtitle {
-            text-align: center;
             font-size: 13px;
             color: #8e8e93;
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* Control Bar */
+        .control-bar {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            border: 1px solid #e5e5ea;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .control-bar div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .control-bar label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #3a3a3c;
+        }
+        .control-bar input[type="date"], .control-bar select {
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid #c7c7cc;
+            border-radius: 8px;
+            outline: none;
+            background: #f8f8f6;
+            color: #1c1c1e;
+            font-weight: 600;
+        }
+        .action-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Dashboard Box */
+        .dashboard {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            border: 1px solid #e5e5ea;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+        .dashboard-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #8e8e93;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .stat-category {
+            background: #f8f8f6;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e5e5ea;
+        }
+        .stat-cat-title {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .title-50 { color: #b24700; }
+        .title-80 { color: #004080; }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #3a3a3c;
+            margin-bottom: 4px;
+        }
+        .stat-row span:last-child {
+            font-weight: 700;
+        }
+        .oil-total-box {
+            grid-column: span 2;
+            background: #eef5ff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #004080;
+            border: 1px solid #d0e1fd;
+            margin-top: 4px;
+        }
+
+        .level-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 24px 0 8px 4px;
+            color: #2c2c2e;
+            border-bottom: 2px solid #d1d1d6;
+            padding-bottom: 4px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .card.completed {
+            background: #f9f9fb;
+            opacity: 0.7;
+        }
+        .card.is-ns {
+            background: #fff5f5;
+            border: 1px solid #ffcdd2;
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stand-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stand-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #34c759;
+            cursor: pointer;
+        }
+        .ns-toggle-btn {
+            background: #e5e5ea;
+            color: #8e8e93;
+            border: none;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 800;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .ns-toggle-btn.active {
+            background: #ff3b30;
+            color: white;
+        }
+        .badge {
+            background: #e5e5ea;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-50 { background: #ffe5d0; color: #b24700; }
+        .badge-80 { background: #d0e1fd; color: #004080; }
+        
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f2f2f7;
+            padding-top: 8px;
+        }
+        .info-text {
+            font-size: 13px;
+            color: #3a3a3c;
+            font-weight: 500;
+        }
+        .error-msg {
+            font-size: 11px;
+            color: #ff3b30;
+            font-weight: 600;
+            display: none;
+        }
+        .error-msg.visible {
+            display: block;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .stepper-btn {
+            background: #e5e5ea;
+            color: #1c1c1e;
+            border: none;
+            width: 32px;
+            height: 38px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        input[type="text"] {
+            width: 50px;
+            padding: 8px;
+            font-size: 15px;
+            text-align: center;
+            border: 1px solid #c7c7cc;
+            border-radius: 8px;
+            outline: none;
+        }
+        input.error-input {
+            border-color: #ff3b30;
+            background-color: #fff2f2;
+        }
+
+        /* Secret Admin Panel */
+        .admin-panel {
+            display: none;
+            background: #2c2c2e;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .admin-panel.visible {
+            display: block;
+        }
+        .admin-panel h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #ff9500;
+        }
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             margin-bottom: 12px;
         }
-        /* Date & Action Bar */
-        .control-bar {
+        .admin-form input, .admin-form select {
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+        }
+        .admin-stand-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #3a3a3c;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+        .admin-stand-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .admin-btn-sm {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .admin-btn-danger {
+            background: #ff3b30;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Tap 5 times on title to access Secret Admin Panel -->
+<h1 onclick="handleTitleClick()">Angel's Stadium</h1>
+<div class="subtitle">Service Log</div>
+
+<!-- Secret Admin Panel -->
+<div id="admin-panel" class="admin-panel">
+    <h3>Secret Menu: Edit Levels & Stands</h3>
+    <div class="admin-form">
+        <input type="text" id="new-level-name" placeholder="New Level Name">
+        <button class="action-btn" onclick="addLevel()">Add Level</button>
+    </div>
+    <hr style="border-color: #444;">
+    <div class="admin-form">
+        <select id="select-level" onchange="populateAdminStandsList()"></select>
+        <input type="text" id="new-stand-id" placeholder="Stand ID (e.g. #501)">
+        <select id="new-stand-size">
+            <option value="50">50 lb</option>
+            <option value="80">80 lb</option>
+            <option value="8">8 lb</option>
+        </select>
+        <input type="number" id="new-stand-total" placeholder="Max Fryer Count">
+        <button class="action-btn" style="background:#34c759;" onclick="addStand()">Add Stand</button>
+    </div>
+    <hr style="border-color: #444;">
+    <h3>Manage Technicians</h3>
+    <div class="admin-form">
+        <input type="text" id="new-tech-name" placeholder="New Technician Name">
+        <button class="action-btn" onclick="addTechnician()">Add Technician</button>
+    </div>
+    <div id="admin-tech-container" style="max-height: 120px; overflow-y: auto; margin-bottom: 12px;"></div>
+    <hr style="border-color: #444;">
+    <div id="admin-stands-container" style="max-height: 200px; overflow-y: auto;"></div>
+</div>
+
+<!-- Control Bar -->
+<div class="control-bar">
+    <div>
+        <label for="technician-select">Tech:</label>
+        <select id="technician-select" onchange="changeTechnician(this.value)"></select>
+        <label for="shift-date">Date:</label>
+        <input type="date" id="shift-date" onchange="changeDate(this.value)">
+    </div>
+    <div>
+        <button class="action-btn" style="background: #34c759;" onclick="submitToCloud()">☁️ Sync to Sheet</button>
+        <button class="action-btn" onclick="printReport()">🖨️ Print</button>
+    </div>
+</div>
+
+<!-- Summary Dashboard Box -->
+<div class="dashboard">
+    <div class="dashboard-title">Service Totals Dashboard</div>
+    <div class="stats-grid">
+        <div class="stat-category">
+            <div class="stat-cat-title title-50">50 lb Fryers</div>
+            <div class="stat-row"><span>Filter:</span> <span id="f50-val">0</span></div>
+            <div class="stat-row"><span>Dump:</span> <span id="d50-val">0</span></div>
+        </div>
+        <div class="stat-category">
+            <div class="stat-cat-title title-80">80 lb Fryers</div>
+            <div class="stat-row"><span>Filter:</span> <span id="f80-val">0</span></div>
+            <div class="stat-row"><span>Dump:</span> <span id="d80-val">0</span></div>
+        </div>
+        <div class="oil-total-box">
+            <span>Total Oil Used:</span>
+            <span><span id="total-oil-val">0</span> gal</span>
+        </div>
+    </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwOZFVD1iITEH34zV5g8PGmb4osXYWAM7fPUh-tmeDyMaBe3_YLJkJ4Tdzeb1CpzB2k/exec"; 
+    
+    const defaultData = [
+        { level: "View Level", stands: [{ id: "#411", size: 50, total: 4 }, { id: "#425", size: 50, total: 4 }] },
+        { level: "Club Level", stands: [{ id: "#344", size: 50, total: 2 }, { id: "#334", size: 50, total: 3 }, { id: "1st Base", size: 80, total: 4 }] },
+        { level: "Terrace Level", stands: [{ id: "#226", size: 80, total: 3 }, { id: "#223", size: 50, total: 6 }] },
+        { level: "Field Level", stands: [{ id: "#130", size: 50, total: 6 }, { id: "#109", size: 50, total: 1 }] }
+    ];
+
+    const defaultTechs = ["Angel", "Manuel", "Carlos", "Moses"];
+
+    let stadiumData = JSON.parse(localStorage.getItem('angels_stadium_config_v10')) || defaultData;
+    let technicianList = JSON.parse(localStorage.getItem('angels_technicians_v10')) || defaultTechs;
+    let selectedTech = localStorage.getItem('angels_selected_tech_v10') || technicianList[0];
+    let allLogs = JSON.parse(localStorage.getItem('angels_fryer_logs_v10')) || {};
+    let currentDate = new Date().toLocaleDateString('en-CA');
+    document.getElementById('shift-date').value = currentDate;
+
+    function initTechnicianDropdown() {
+        const select = document.getElementById('technician-select');
+        select.innerHTML = '';
+        technicianList.forEach(tech => {
+            let opt = document.createElement('option');
+            opt.value = tech;
+            opt.innerText = tech;
+            if (tech === selectedTech) opt.selected = true;
+            select.appendChild(opt);
+        });
+    }
+
+    function changeTechnician(val) {
+        selectedTech = val;
+        localStorage.setItem('angels_selected_tech_v10', selectedTech);
+    }
+
+    let titleClickCount = 0;
+    let titleClickTimer = null;
+    function handleTitleClick() {
+        titleClickCount++;
+        clearTimeout(titleClickTimer);
+        if (titleClickCount >= 5) {
+            const adminPanel = document.getElementById('admin-panel');
+            adminPanel.classList.toggle('visible');
+            updateAdminLevelSelect();
+            updateAdminTechList();
+            titleClickCount = 0;
+        } else {
+            titleClickTimer = setTimeout(() => { titleClickCount = 0; }, 3000);
+        }
+    }
+
+    function updateAdminTechList() {
+        const container = document.getElementById('admin-tech-container');
+        container.innerHTML = '';
+        technicianList.forEach((tech, idx) => {
+            const item = document.createElement('div');
+            item.className = 'admin-stand-list-item';
+            item.innerHTML = `
+                <span><b>${tech}</b></span>
+                <button class="admin-btn-sm admin-btn-danger" onclick="deleteTechnician(${idx})">✕</button>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function addTechnician() {
+        const name = document.getElementById('new-tech-name').value.trim();
+        if (!name) return;
+        technicianList.push(name);
+        localStorage.setItem('angels_technicians_v10', JSON.stringify(technicianList));
+        document.getElementById('new-tech-name').value = '';
+        updateAdminTechList();
+        initTechnicianDropdown();
+    }
+
+    function deleteTechnician(idx) {
+        if (technicianList.length <= 1) {
+            alert("You must keep at least one technician.");
+            return;
+        }
+        technicianList.splice(idx, 1);
+        localStorage.setItem('angels_technicians_v10', JSON.stringify(technicianList));
+        updateAdminTechList();
+        initTechnicianDropdown();
+    }
+
+    function updateAdminLevelSelect() {
+        const select = document.getElementById('select-level');
+        select.innerHTML = '';
+        stadiumData.forEach((sec, idx) => {
+            let opt = document.createElement('option');
+            opt.value = idx;
+            opt.innerText = sec.level;
+            select.appendChild(opt);
+        });
+        populateAdminStandsList();
+    }
+
+    function populateAdminStandsList() {
+        const levelIdx = document.getElementById('select-level').value;
+        const container = document.getElementById('admin-stands-container');
+        container.innerHTML = '';
+        if (levelIdx === "" || !stadiumData[levelIdx]) return;
+
+        stadiumData[levelIdx].stands.forEach((stand, standIdx) => {
+            const item = document.createElement('div');
+            item.className = 'admin-stand-list-item';
+            item.innerHTML = `
+                <span><b>${stand.id}</b> (${stand.size}lb)</span>
+                <button class="admin-btn-sm admin-btn-danger" onclick="deleteStand(${levelIdx}, '${stand.id}')">✕</button>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function addLevel() {
+        const name = document.getElementById('new-level-name').value.trim();
+        if (!name) return;
+        stadiumData.push({ level: name, stands: [] });
+        saveConfig();
+        document.getElementById('new-level-name').value = '';
+        updateAdminLevelSelect();
+        render();
+    }
+
+    function addStand() {
+        const levelIdx = document.getElementById('select-level').value;
+        const id = document.getElementById('new-stand-id').value.trim();
+        const size = parseInt(document.getElementById('new-stand-size').value, 10);
+        const total = parseInt(document.getElementById('new-stand-total').value, 10);
+        if (!id || isNaN(total)) return;
+        stadiumData[levelIdx].stands.push({ id, size, total });
+        saveConfig();
+        document.getElementById('new-stand-id').value = '';
+        document.getElementById('new-stand-total').value = '';
+        populateAdminStandsList();
+        render();
+    }
+
+    function deleteStand(levelIdx, standId) {
+        stadiumData[levelIdx].stands = stadiumData[levelIdx].stands.filter(s => s.id !== standId);
+        saveConfig();
+        populateAdminStandsList();
+        render();
+    }
+
+    function saveConfig() {
+        localStorage.setItem('angels_stadium_config_v10', JSON.stringify(stadiumData));
+    }
+
+    function getCurrentDateState() {
+        if (!allLogs[currentDate]) allLogs[currentDate] = {};
+        return allLogs[currentDate];
+    }
+
+    function changeDate(newDateStr) {
+        if (!newDateStr) return;
+        currentDate = newDateStr;
+        render();
+    }
+
+    function render() {
+        const app = document.getElementById('app');
+        app.innerHTML = '';
+        const dayState = getCurrentDateState();
+
+        stadiumData.forEach(section => {
+            const levelDiv = document.createElement('div');
+            levelDiv.className = 'level-header';
+            levelDiv.innerText = section.level;
+            app.appendChild(levelDiv);
+
+            section.stands.forEach(stand => {
+                const standState = dayState[stand.id] || { filter: '', dump: '', oil: '', done: false, isNS: false };
+                const safeId = stand.id.replace(/[^a-zA-Z0-9]/g, '_');
+
+                const card = document.createElement('div');
+                card.className = `card ${standState.done ? 'completed' : ''} ${standState.isNS ? 'is-ns' : ''}`;
+
+                card.innerHTML = `
+                    <div class="card-top">
+                        <div class="stand-left">
+                            <input type="checkbox" ${standState.done ? 'checked' : ''} onchange="toggleDone('${stand.id}', this.checked)">
+                            <button class="ns-toggle-btn ${standState.isNS ? 'active' : ''}" onclick="toggleNS('${stand.id}')">NS</button>
+                            <span class="stand-title">${stand.id}</span>
+                        </div>
+                        <span class="badge ${stand.size === 50 ? 'badge-50' : 'badge-80'}">${stand.size} lb</span>
+                    </div>
+                    <div class="card-row">
+                        <span class="info-text">Filtered:</span>
+                        <div class="input-group">
+                            <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'filter', -1)">−</button>
+                            <input type="text" id="input-filter-${safeId}" value="${standState.isNS ? 'NS' : standState.filter}" ${standState.isNS ? 'disabled' : ''} oninput="handleInput('${stand.id}')">
+                            <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'filter', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="card-row">
+                        <span class="info-text">Dumped:</span>
+                        <div class="input-group">
+                            <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'dump', -1)">−</button>
+                            <input type="text" id="input-dump-${safeId}" value="${standState.isNS ? 'NS' : standState.dump}" ${standState.isNS ? 'disabled' : ''} oninput="handleInput('${stand.id}')">
+                            <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'dump', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="card-row">
+                        <span class="info-text">Oil Used (gal):</span>
+                        <input type="text" value="${standState.oil}" oninput="handleOil('${stand.id}', this.value)">
+                    </div>
+                `;
+                app.appendChild(card);
+            });
+        });
+        updateTotals();
+    }
+
+    function toggleDone(id, val) {
+        let dayState = getCurrentDateState();
+        if (!dayState[id]) dayState[id] = { filter: '', dump: '', oil: '', done: false, isNS: false };
+        dayState[id].done = val;
+        saveLogs();
+        render();
+    }
+
+    function toggleNS(id) {
+        let dayState = getCurrentDateState();
+        if (!dayState[id]) dayState[id] = { filter: '', dump: '', oil: '', done: false, isNS: false };
+        dayState[id].isNS = !dayState[id].isNS;
+        dayState[id].filter = dayState[id].isNS ? 'NS' : '';
+        dayState[id].dump = dayState[id].isNS ? 'NS' : '';
+        saveLogs();
+        render();
+    }
+
+    function adjustCount(id, field, delta) {
+        let dayState = getCurrentDateState();
+        if (!dayState[id]) dayState[id] = { filter: '', dump: '', oil: '', done: false, isNS: false };
+        if (dayState[id].isNS) return;
+        let cur = parseInt(dayState[id][field]) || 0;
+        let next = cur + delta;
+        if (next < 0) next = 0;
+        dayState[id][field] = next === 0 ? '' : String(next);
+        saveLogs();
+        render();
+    }
+
+    function handleInput(id) {
+        // Handled via state inputs directly
+    }
+
+    function handleOil(id, val) {
+        let dayState = getCurrentDateState();
+        if (!dayState[id]) dayState[id] = { filter: '', dump: '', oil: '', done: false, isNS: false };
+        dayState[id].oil = val;
+        saveLogs();
+        updateTotals();
+    }
+
+    function saveLogs() {
+        localStorage.setItem('angels_fryer_logs_v10', JSON.stringify(allLogs));
+    }
+
+    function updateTotals() {
+        let f50 = 0, d50 = 0, f80 = 0, d80 = 0, totalOil = 0;
+        let dayState = getCurrentDateState();
+        stadiumData.forEach(section => {
+            section.stands.forEach(stand => {
+                let obj = dayState[stand.id];
+                if (!obj) return;
+                if (!obj.isNS) {
+                    let f = parseInt(obj.filter) || 0;
+                    let d = parseInt(obj.dump) || 0;
+                    if (stand.size === 50) { f50 += f; d50 += d; }
+                    if (stand.size === 80) { f80 += f; d80 += d; }
+                }
+                let oil = parseFloat(obj.oil) || 0;
+                totalOil += oil;
+            });
+        });
+        document.getElementById('f50-val').innerText = f50;
+        document.getElementById('d50-val').innerText = d50;
+        document.getElementById('f80-val').innerText = f80;
+        document.getElementById('d80-val').innerText = d80;
+        document.getElementById('total-oil-val').innerText = totalOil.toFixed(1);
+    }
+
+    function submitToCloud() {
+        let dayState = getCurrentDateState();
+        let f50Total = 0, d50Total = 0, f80Total = 0, d80Total = 0, oilTotal = 0;
+
+        stadiumData.forEach(sec => {
+            sec.stands.forEach(st => {
+                let stObj = dayState[st.id];
+                if (stObj && !stObj.isNS) {
+                    if (st.size === 50) { f50Total += (parseInt(stObj.filter) || 0); d50Total += (parseInt(stObj.dump) || 0); }
+                    if (st.size === 80) { f80Total += (parseInt(stObj.filter) || 0); d80Total += (parseInt(stObj.dump) || 0); }
+                }
+                if (stObj && stObj.oil) oilTotal += (parseFloat(stObj.oil) || 0);
+            });
+        });
+
+        let payload = {
+            technician: selectedTech,
+            fieldLevel: "Logged",
+            terraceLevel: "Logged",
+            clubLevel: "Logged",
+            viewLevel: "Logged",
+            comments: `Shift Date: ${currentDate}`,
+            f50Count: f50Total,
+            d50Count: d50Total,
+            f80Count: f80Total,
+            d80Count: d80Total,
+            oilUsed: oilTotal
+        };
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            alert("Successfully logged to Google Sheet!");
+        }).catch(err => {
+            alert("Error logging data: " + err);
+        });
+    }
+
+    function printReport() { window.print(); }
+
+    initTechnicianDropdown();
+    render();
+</script>
+</body>
+</html>
