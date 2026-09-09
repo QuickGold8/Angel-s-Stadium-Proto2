@@ -398,11 +398,10 @@
     const defaultData = [
         { level: "View Level", stands: [{ id: "#411", size: 50, total: 4 }, { id: "#425", size: 50, total: 4 }] },
         { level: "Club Level", stands: [{ id: "#344", size: 50, total: 2 }, { id: "#334", size: 50, total: 3 }, { id: "1st Base", size: 80, total: 4 }] },
-        { level: "Terrace Level", stands: [{ id: "#226", size: 80, total: 3 }, { id: "#223", size: 50, total: 6 }] },
-        { level: "Field Level", stands: [{ id: "#130", size: 50, total: 6 }, { id: "#109", size: 50, total: 1 }] }
-    ];
-
-    const defaultTechs = ["Angel", "Manuel", "Carlos", "Moses"];
+        { level: "Terrace Level", stands: [{ id: "#226", size: 80, total: 3 }, { id: "#223", size: 50, total: 6 },{ id: "#207", size: 50, total: 4 }, { id: "#207", size: 80, total: 2 }, { id: "#255", size: 50, total: 4 }, { id: "#255", size: 80, total: 3 },
+        { level: "Field Level", stands: [{ id: "#130", size: 50, total: 6 }, { id: "DC Restaurant", size: 80, total: 3 }, { id: "#DC Inseat", size: 80, total: 3 }, { id: "#109", size: 50, total: 1 }, { id: "#106", size: 80, total: 4 }, { id: "Main Kitchen", size: 80, total: 3 }, { id: "Commissary", size: 80, total: 1 }] },
+        
+     const defaultTechs = ["Angel", "Manuel", "Carlos", "Moses", "Frankie"]};
 
     let stadiumData = JSON.parse(localStorage.getItem('angels_stadium_config_v10')) || defaultData;
     let technicianList = JSON.parse(localStorage.getItem('angels_technicians_v10')) || defaultTechs;
