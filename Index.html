@@ -3,8 +3,8 @@
 <head>
   <header class="app-header">
   <img src="filtalogo.png" alt="Filta Logo" class="app-header-icon" />
-  <h1>Filta</h1>
-</header>
+  <h1>Angels Stadium Fryer Tracker</h1>
+</header>  
 </head>
 <head>
     <meta charset="UTF-8">
@@ -18,7 +18,6 @@
             --text-primary: #fff;
             --text-muted: #aaa;
             --text-x: #7CBB4E;
-            --text-z: #0497cb;
             --accent-red: #ba0021;
             --accent-green: #34c759;
             --accent-blue: #007aff;
@@ -36,7 +35,6 @@
 
         h1 {
             font-size: 20px;
-            color: Var(--text-z);
             margin: 0;
             display: flex;
             cursor: pointer;
@@ -44,35 +42,18 @@
         }
 
         .app-header {
-            font-size: 15px;
-            color: var(--text-x);
             display: flex;
             align-items: center;
-            gap: 1px; /* Space between icon and header text */
+            gap: 12px; /* Space between icon and header text */
         }
 
         .app-header-icon {
-            width: 35px;  /* Optimal header scale */
-            height: 35px;
-            border-radius: 1px; /* Smooth squircle corners */
-            object-fit: contain;
-            flex-shrink: 0;
-        }
-        .app-subheader {
-            font-size: 20px;
-            color: var(--text-z);
-            display: flex;
-            align-items: center;
-            gap: 1px; /* Space between icon and header text */
-        }
-
-        .app-subheader-icon {
-            width: 20px;  /* Optimal header scale */
-            height: 20px;
+            width: 38px;  /* Optimal header scale */
+            height: 38px;
             border-radius: 8px; /* Smooth squircle corners */
             object-fit: contain;
             flex-shrink: 0;
-      
+        }
         .header-container {
             display: flex;
             align-items: baseline;
@@ -386,10 +367,7 @@
 </div>
 
 <div class="header-container">
-    <span class="subtitle">•Service Log•</span>
-    <header class="app-subheader">
-  <img src="angelslogo.png" alt="Angels Logo" class="brand-logo brand-logo--subheader" />
-</header>
+    <span class="subtitle">✍︎Service Log</span>
     <h1 onclick="handleTitleClick()">Angel's Stadium</h1>
 </div>
 
@@ -400,7 +378,7 @@
         <input type="text" id="new-level-name" placeholder="New Level (e.g. Suite Level)">
         <button class="action-btn" onclick="addLevel()">Add Level</button>
     </div>
-    <hr style="border-color: #7cbb4e;">
+    <hr style="border-color: #444;">
     <div class="admin-form">
         <select id="select-level" onchange="populateAdminStandsList()"></select>
         <input type="text" id="new-stand-id" placeholder="Stand ID (e.g. #501)">
@@ -412,11 +390,11 @@
         <input type="number" id="new-stand-total" placeholder="Max Fryers (e.g. 4)">
         <button class="action-btn" style="background:#34c759;" onclick="addStand()">Add Stand</button>
     </div>
-    <hr style="border-color: #7cbb4e;">
+    <hr style="border-color: #444;">
     <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px; color: var(--accent-gold);">Manage Stands:</div>
     <div id="admin-stands-container" style="max-height: 180px; overflow-y: auto;"></div>
 
-    <hr style="border-color: #7cbb4e; margin-top: 15px;">
+    <hr style="border-color: #444; margin-top: 15px;">
     <h3>Secret Menu: Edit Technicians</h3>
     <div class="admin-form">
         <input type="text" id="new-tech-name" placeholder="Technician Name">
