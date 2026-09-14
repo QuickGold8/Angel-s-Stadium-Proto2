@@ -72,6 +72,10 @@
             font-size: 13px;
             cursor: pointer;
         }
+        .action-btn:disabled {
+            background: #8e8e93 !important;
+            cursor: not-allowed;
+        }
 
         /* Dashboard Box */
         .dashboard {
@@ -369,7 +373,7 @@
         <input type="date" id="shift-date" onchange="changeDate(this.value)">
     </div>
     <div>
-        <button class="action-btn" style="background: #34c759;" onclick="submitToCloud()">☁️ Sync to Sheet</button>
+        <button id="sync-btn" class="action-btn" style="background: #34c759;" onclick="submitToCloud()">☁️ Sync to Sheet</button>
         <button class="action-btn" onclick="printReport()">🖨️ Print</button>
     </div>
 </div>
@@ -402,6 +406,10 @@
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwOZFVD1iITEH34zV5g8PGmb4osXYWAM7fPUh-tmeDyMaBe3_YLJkJ4Tdzeb1CpzB2k/exec"; 
     
+    // Interval delay between each stand submission (60ms >= 0.05s)
+    const LOG_DELAY_MS = 60;
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     const defaultData = [
       { level: "View Level", stands: [{ id: "#411", size: 50, total: 4 }, { id: "#425", size: 50, total: 4 }] },
       { level: "Club Level", stands: [{ id: "#344", size: 50, total: 2 }, { id: "#334", size: 50, total: 3 }, { id: "1st Base", size: 80, total: 4 }] },        
@@ -684,73 +692,84 @@
         document.getElementById('total-oil-val').innerText = totalOil.toFixed(1);
     }
 
-    function getLevelSummary(levelName) {
-        const sec = stadiumData.find(s => s.level.toLowerCase().trim() === levelName.toLowerCase().trim());
-        if (!sec || !sec.stands.length) return "N/A";
-        
-        const dayState = getCurrentDateState();
-
-        const standEntries = sec.stands.map(st => {
-            const s = dayState[st.id];
-            if (!s) return `${st.id}: Not Serviced`;
-            if (s.isNS) return `${st.id}: [NS]`;
-            
-            const f = s.filter !== "" ? s.filter : "0";
-            const d = s.dump !== "" ? s.dump : "0";
-            const oil = s.oil !== "" ? `${s.oil}gal` : "0gal";
-            const doneMark = s.done ? "✓ " : "";
-            
-            return `${doneMark}${st.id} (F:${f}, D:${d}, Oil:${oil})`;
-        });
-
-        return standEntries.join(" | ");
-    }
-
-    function submitToCloud() {
+    async function submitToCloud() {
+        const syncBtn = document.getElementById('sync-btn');
         let dayState = getCurrentDateState();
-        let f50Total = 0, d50Total = 0, f80Total = 0, d80Total = 0, oilTotal = 0;
-
+        
+        // 1. Gather all stands that have activity (service logged, oil recorded, marked done, or marked NS)
+        let queue = [];
         stadiumData.forEach(sec => {
             sec.stands.forEach(st => {
-                let stObj = dayState[st.id];
-                if (stObj && !stObj.isNS) {
-                    if (st.size === 50) { 
-                        f50Total += (parseInt(stObj.filter) || 0); 
-                        d50Total += (parseInt(stObj.dump) || 0); 
-                    }
-                    if (st.size === 80) { 
-                        f80Total += (parseInt(stObj.filter) || 0); 
-                        d80Total += (parseInt(stObj.dump) || 0); 
-                    }
+                let s = dayState[st.id];
+                let hasActivity = s && (
+                    s.done || 
+                    s.isNS || 
+                    (s.filter !== '' && s.filter !== '0') || 
+                    (s.dump !== '' && s.dump !== '0') || 
+                    (s.oil !== '' && s.oil !== '0')
+                );
+
+                if (hasActivity) {
+                    let fCount = (s.isNS || !s.filter) ? 0 : parseInt(s.filter) || 0;
+                    let dCount = (s.isNS || !s.dump) ? 0 : parseInt(s.dump) || 0;
+                    let oilVal = parseFloat(s.oil) || 0;
+
+                    let lvl = sec.level.toLowerCase();
+                    let fieldLvl = lvl.includes("field") ? st.id : "";
+                    let terraceLvl = lvl.includes("terrace") ? st.id : "";
+                    let clubLvl = lvl.includes("club") ? st.id : "";
+                    let viewLvl = lvl.includes("view") ? st.id : "";
+
+                    queue.push({
+                        technician: selectedTech,
+                        fieldLevel: fieldLvl,
+                        terraceLevel: terraceLvl,
+                        clubLevel: clubLvl,
+                        viewLevel: viewLvl,
+                        comments: s.isNS ? `NS | Shift Date: ${currentDate}` : `Shift Date: ${currentDate}`,
+                        f50Count: st.size === 50 ? fCount : 0,
+                        d50Count: st.size === 50 ? dCount : 0,
+                        f80Count: st.size === 80 ? fCount : 0,
+                        d80Count: st.size === 80 ? dCount : 0,
+                        oilUsed: oilVal
+                    });
                 }
-                if (stObj && stObj.oil) oilTotal += (parseFloat(stObj.oil) || 0);
             });
         });
 
-        let payload = {
-            technician: selectedTech,
-            fieldLevel: getLevelSummary("Field Level"),
-            terraceLevel: getLevelSummary("Terrace Level"),
-            clubLevel: getLevelSummary("Club Level"),
-            viewLevel: getLevelSummary("View Level"),
-            comments: `Shift Date: ${currentDate}`,
-            f50Count: f50Total,
-            d50Count: d50Total,
-            f80Count: f80Total,
-            d80Count: d80Total,
-            oilUsed: oilTotal
-        };
+        if (queue.length === 0) {
+            alert("No stands have activity logged for this shift.");
+            return;
+        }
 
-        fetch(WEB_APP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        }).then(() => {
-            alert("Successfully logged to Google Sheet!");
-        }).catch(err => {
-            alert("Error logging data: " + err);
-        });
+        // 2. Submit sequentially with at least 0.05s delay between rows
+        syncBtn.disabled = true;
+        const originalText = syncBtn.innerText;
+
+        try {
+            for (let i = 0; i < queue.length; i++) {
+                syncBtn.innerText = `⏳ Logging ${i + 1}/${queue.length}...`;
+
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(queue[i])
+                });
+
+                // Wait at least 0.05 seconds before dispatching the next request
+                if (i < queue.length - 1) {
+                    await sleep(LOG_DELAY_MS);
+                }
+            }
+
+            alert(`Successfully logged ${queue.length} stands to Google Sheet!`);
+        } catch (err) {
+            alert("Error during logging sequence: " + err);
+        } finally {
+            syncBtn.disabled = false;
+            syncBtn.innerText = originalText;
+        }
     }
 
     function printReport() { window.print(); }
