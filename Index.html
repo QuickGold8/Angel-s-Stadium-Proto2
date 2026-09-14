@@ -3,12 +3,11 @@
 <head>
   <header class="app-header">
   <img src="filtalogo.png" alt="Filta Logo" class="app-header-icon" />
-  <h1>Filtan</h1>
-</header>  
-</head>
+  <h1>Filta</h1>
+</header>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.75">
     <title>Angels Stadium Service Report</title>
     <style>
         :root {
@@ -19,6 +18,7 @@
             --text-muted: #aaa;
             --text-x: #7CBB4E;
             --text-z: #0479cb;
+            --text-y: #a302de;
             --accent-red: #ba0021;
             --accent-green: #34c759;
             --accent-blue: #007aff;
@@ -143,7 +143,7 @@
         }
         .control-bar label {
             font-size: 12px;
-            color: var(--text-muted);
+            color: var(--text-y);
             margin-right: 4px;
         }
         .control-bar input, .control-bar select {
@@ -165,7 +165,7 @@
             cursor: pointer;
         }
         .cloud-btn {
-            background: var(--accent-blue);
+            background: var(--accent-green);
         }
 
         /* Dashboard */
@@ -275,7 +275,7 @@
         .stepper-btn {
             background: #333;
             color: white;
-            border: 1px solid #555;
+            border: 1px solid #7cbb4e;
             width: 26px;
             height: 26px;
             border-radius: 4px;
@@ -388,7 +388,6 @@
         <select id="new-stand-size">
             <option value="50">50 lb</option>
             <option value="80">80 lb</option>
-            <option value="8">8 lb</option>
         </select>
         <input type="number" id="new-stand-total" placeholder="Max Fryers (e.g. 4)">
         <button class="action-btn" style="background:#34c759;" onclick="addStand()">Add Stand</button>
@@ -425,7 +424,7 @@
 
 <!-- Summary Dashboard -->
 <div class="dashboard">
-    <div class="dashboard-title">Service Totals Dashboard</div>
+    <div class="dashboard-title">✎Service Totals✔︎</div>
     <div class="stats-grid">
         <div class="stat-category">
             <div class="stat-cat-title title-50">50 lb Fryers</div>
@@ -440,9 +439,7 @@
         <div class="oil-total-box">
             <span>Total Oil:</span>
             <span style="font-size: 15px; color: var(--accent-gold);"><span id="total-oil-val">0</span> gal</span>
-        </div>
-    </div>
-</div>
+         </div>
 
 <div id="app"></div>
 
@@ -1014,6 +1011,7 @@
     }
 
     function render() {
+        
         const app = document.getElementById('app');
         app.innerHTML = '';
         const dayState = getCurrentDateState();
@@ -1052,12 +1050,11 @@
                     </div>
 
                     <div class="print-only-val">${printDisplay.join(" | ")}</div>
-
                     <div class="card-row">
                         <span class="info-text">Filtered count:</span>
-                        <div class="input-group">
+                        <div class="input-group"
                             <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'filter', -1)">−</button>
-                            <input type="text" id="input-filter-${safeId}" value="${standState.filter}" ${standState.isNS ? 'disabled' : ''} placeholder="0" oninput="handleInput('${stand.id}')">
+                            <input type="text" "imputmode="Numeric" pattern="[0-9]*" id="input-filter-${safeId}" value="${standState.filter}" ${standState.isNS ? 'disabled' : ''} placeholder="0" oninput="handleInput('${stand.id}')">
                             <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'filter', 1)">+</button>
                         </div>
                     </div>
@@ -1066,7 +1063,7 @@
                         <span class="info-text">Dumped count:</span>
                         <div class="input-group">
                             <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'dump', -1)">−</button>
-                            <input type="text" id="input-dump-${safeId}" value="${standState.dump}" ${standState.isNS ? 'disabled' : ''} placeholder="0" oninput="handleInput('${stand.id}')">
+                            <input type="text" inputmode="numeric" pattern="[0-9]*> <id="input-dump-${safeId}" value="${standState.dump}" ${standState.isNS ? 'disabled' : ''} placeholder="0" oninput="handleInput('${stand.id}')">
                             <button class="stepper-btn" onclick="adjustCount('${stand.id}', 'dump', 1)">+</button>
                         </div>
                     </div>
@@ -1076,7 +1073,7 @@
                     <div class="card-row">
                         <span class="info-text">Oil Sold / Used (gal):</span>
                         <div class="input-group">
-                            <input type="text" value="${standState.oil || ''}" placeholder="Gal" oninput="handleOil('${stand.id}', this.value)">
+                            <input type="text" inputmode="decimal" value="${standState.oil || ''}" placeholder="Gal" oninput="handleOil('${stand.id}', this.value)">
                         </div>
                     </div>
                 `;
